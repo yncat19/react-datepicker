@@ -1,5 +1,6 @@
 import React from "react";
 import PropTypes from "prop-types";
+import AccessibilityHelper from "./accessibility_helper";
 import Calendar from "./calendar";
 import PopperComponent, { popperPlacementPositions } from "./popper_component";
 import classnames from "classnames";
@@ -220,6 +221,7 @@ export default class DatePicker extends React.Component {
   constructor(props) {
     super(props);
     this.state = this.calcInitialState();
+    this.refAccessibilityHelper = React.createRef();
   }
 
   componentDidUpdate(prevProps, prevState) {
@@ -291,7 +293,7 @@ export default class DatePicker extends React.Component {
   };
 
   setFocus = () => {
-    if (this.input && this.input.focus) {
+    if (this.input && this.input.focus && !this.previousFocusIsInput()) {
       this.input.focus();
     }
   };
@@ -305,6 +307,7 @@ export default class DatePicker extends React.Component {
   };
 
   setOpen = (open, skipSetBlur = false) => {
+    if (open === this.state.open) return;
     this.setState(
       {
         open: open,
@@ -338,11 +341,9 @@ export default class DatePicker extends React.Component {
       : this.props.open;
 
   handleFocus = event => {
-    if (!this.state.preventFocus) {
-      this.props.onFocus(event);
-      if (!this.props.preventOpenOnFocus && !this.props.readOnly) {
-        this.setOpen(true);
-      }
+    this.props.onFocus(event);
+    if (!this.props.preventOpenOnFocus && !this.props.readOnly) {
+      this.setOpen(true);
     }
     this.setState({ focused: true });
   };
@@ -350,6 +351,12 @@ export default class DatePicker extends React.Component {
   cancelFocusInput = () => {
     clearTimeout(this.inputFocusTimeout);
     this.inputFocusTimeout = null;
+  };
+
+  previousFocusIsInput = () => {
+    let active = document.activeElement;
+    let ret = active.tagName == "INPUT";
+    return ret;
   };
 
   deferFocusInput = () => {
@@ -463,6 +470,7 @@ export default class DatePicker extends React.Component {
     }
 
     this.props.onSelect(changedDate, event);
+    this.triggerSpeech(safeDateFormat(changedDate, this.props) + " selected");
 
     if (!keepInput) {
       this.setState({ inputValue: null });
@@ -487,6 +495,10 @@ export default class DatePicker extends React.Component {
       }
     }
     if (isValidDateSelection) {
+      if (!this.props.adjustDateOnChange)
+        this.triggerSpeech(
+          safeDateFormat(date, this.props) + ", press enter to select"
+        );
       this.setState({
         preSelection: date
       });
@@ -706,6 +718,15 @@ export default class DatePicker extends React.Component {
     );
   };
 
+  renderAccessibilityHelper = () => {
+    return <AccessibilityHelper ref={this.refAccessibilityHelper} />;
+  };
+
+  triggerSpeech = text => {
+    this.refAccessibilityHelper.current &&
+      this.refAccessibilityHelper.current.triggerSpeech(text);
+  };
+
   renderDateInput = () => {
     const className = classnames(this.props.className, {
       [outsideClickIgnoreClass]: this.state.open
@@ -774,6 +795,7 @@ export default class DatePicker extends React.Component {
           {!this.props.inline ? (
             <div className="react-datepicker__input-container">
               {this.renderDateInput()}
+              {this.renderAccessibilityHelper()}
               {this.renderClearButton()}
             </div>
           ) : null}
@@ -793,6 +815,7 @@ export default class DatePicker extends React.Component {
         targetComponent={
           <div className="react-datepicker__input-container">
             {this.renderDateInput()}
+            {this.renderAccessibilityHelper()}
             {this.renderClearButton()}
           </div>
         }

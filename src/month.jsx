@@ -244,6 +244,7 @@ export default class Month extends React.Component {
               this.onMonthClick(ev, m);
             }}
             className={this.getMonthClassNames(m)}
+            role="button"
           >
             {utils.getMonthShortInLocale(m, this.props.locale)}
           </div>
@@ -296,8 +297,7 @@ export default class Month extends React.Component {
       <div
         className={this.getClassNames()}
         onMouseLeave={this.handleMouseLeave}
-        role="listbox"
-        aria-label={"month-" + utils.formatDate(this.props.day, "yyyy-MM")}
+        aria-label={"month - " + utils.formatDate(this.props.day, "yyyy-MM")}
       >
         {showMonthYearPicker
           ? this.renderMonths()

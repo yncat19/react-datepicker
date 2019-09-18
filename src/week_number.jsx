@@ -27,6 +27,7 @@ export default class WeekNumber extends React.Component<{
       <div
         className={classnames(weekNumberClasses)}
         aria-label={`week-${this.props.weekNumber}`}
+        role="button"
         onClick={this.handleClick}
       >
         {this.props.weekNumber}

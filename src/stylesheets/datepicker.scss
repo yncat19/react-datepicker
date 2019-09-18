@@ -18,6 +18,14 @@
   position: relative;
 }
 
+.react-datepicker__accessibilityHelper {
+  position: absolute;
+  left: -10000px;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
+
 .react-datepicker--time-only {
   .react-datepicker__triangle {
     left: 35px;

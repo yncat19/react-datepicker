@@ -532,6 +532,8 @@ export default class Calendar extends React.Component {
       <div
         className="react-datepicker__today-button"
         onClick={e => this.props.onSelect(getStartOfToday(), e)}
+        role="button"
+        aria-label={this.props.todayButton}
       >
         {this.props.todayButton}
       </div>
@@ -539,7 +541,7 @@ export default class Calendar extends React.Component {
   };
 
   renderDefaultHeader = ({ monthDate, i }) => (
-    <div className="react-datepicker__header">
+    <div className="react-datepicker__header" aria-live="polite">
       {this.renderCurrentMonth(monthDate)}
       <div
         className={`react-datepicker__header__dropdown react-datepicker__header__dropdown--${this.props.dropdownMode}`}
